@@ -1,9 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUsersDto } from './dto/create-users.dto';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from './schemas/users,scheme';
 import { Model } from 'mongoose';
+import * as jwt from 'jsonwebtoken';
+import * as bcrypt from 'bcrypt';
+
+import { CreateUsersDto } from './dto/create-users.dto';
+import { User, UserDocument } from './schemas/users,scheme';
 import { UpdateUsersDto } from './dto/update-users.dto';
+import { UserInfoDto } from './dto/user-info.dto';
 
 @Injectable()
 export class UsersService {
@@ -13,7 +17,7 @@ export class UsersService {
     return this.userModel.find().exec();
   }
 
-  getById(id: string): Promise<User> {
+  async getById(id: string): Promise<User> {
     return this.userModel.findById(id).exec();
   }
 
@@ -26,7 +30,33 @@ export class UsersService {
     return this.userModel.findByIdAndDelete(id);
   }
 
-  async update(id: string, userDto: UpdateUsersDto): Promise<User> {
-    return this.userModel.findByIdAndUpdate(id, userDto);
+  async update(id: string, user: UpdateUsersDto): Promise<User> {
+    return this.userModel.findByIdAndUpdate(
+      id,
+      { $set: { ...user } },
+      {
+        new: true,
+      },
+    );
+  }
+
+  async login({ login, password }): Promise<UserInfoDto> {
+    try {
+      const user = await this.findByCredentials(login, password);
+      const token = jwt.sign({ login }, 'secret');
+      return { user, token };
+    } catch (e) {
+      throw new HttpException('Wrong login or password', 400);
+    }
+  }
+
+  private async findByCredentials(login: string, password: string) {
+    const user = await this.userModel.findOne({ login: login });
+    const loginTrue = bcrypt.compareSync(password, user.password);
+    if (loginTrue) {
+      return user;
+    } else {
+      throw new Error('Wrong login or password');
+    }
   }
 }

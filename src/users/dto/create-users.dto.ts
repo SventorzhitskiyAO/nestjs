@@ -1,5 +1,6 @@
 import { IsString, MaxLength, MinLength } from 'class-validator';
 import { Matches } from 'class-validator';
+import { Match } from '../../decorators/match.decorator';
 
 export class CreateUsersDto {
   @IsString()
@@ -19,4 +20,10 @@ export class CreateUsersDto {
     message: 'password too weak',
   })
   password: string;
+
+  @IsString()
+  @MinLength(5)
+  @MaxLength(20)
+  @Match('password')
+  passwordConfirm: string;
 }
