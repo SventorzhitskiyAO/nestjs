@@ -8,10 +8,14 @@ import { CreateUsersDto } from './dto/create-users.dto';
 import { User, UserDocument } from './schemas/users,scheme';
 import { UpdateUsersDto } from './dto/update-users.dto';
 import { UserInfoDto } from './dto/user-info.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private configService: ConfigService,
+  ) {}
 
   async getAll(): Promise<User[]> {
     return this.userModel.find().exec();
@@ -42,15 +46,16 @@ export class UsersService {
 
   async login({ login, password }): Promise<UserInfoDto> {
     try {
-      const user = await this.findByCredentials(login, password);
-      const token = jwt.sign({ login }, 'secret');
+      const jwtToken = this.configService.get('JWT_SECRET');
+      const user = await this.checkCredentials(login, password);
+      const token = jwt.sign({ login }, jwtToken);
       return { user, token };
     } catch (e) {
       throw new HttpException('Wrong login or password', 400);
     }
   }
 
-  private async findByCredentials(login: string, password: string) {
+  private async checkCredentials(login: string, password: string) {
     const user = await this.userModel.findOne({ login: login });
     const loginTrue = bcrypt.compareSync(password, user.password);
     if (loginTrue) {

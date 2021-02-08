@@ -3,10 +3,14 @@ import * as jwt from 'jsonwebtoken';
 import { User, UserDocument } from '../users/schemas/users,scheme';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersGuards implements CanActivate {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private configService: ConfigService,
+  ) {}
 
   canActivate(context: ExecutionContext): boolean | Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
@@ -22,11 +26,12 @@ export class UsersGuards implements CanActivate {
       return false;
     }
     try {
+      const jwtSecret = this.configService.get('JWT_SECRET');
       const token = request.headers['authorization']
         .toString()
         .replace('Bearer ', '');
-      const userInfo = jwt.verify(token, 'secret');
-      console.log(userInfo);
+      const userInfo = jwt.verify(token, jwtSecret);
+
       if (userInfo) {
         const user = await this.userModel
           .findOne({ login: userInfo.login })

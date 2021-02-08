@@ -6,31 +6,40 @@ import {
   MinLength,
 } from 'class-validator';
 import { Match } from '../../decorators/match.decorator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateUsersDto {
+  @ApiProperty({
+    required: false,
+  })
   @IsString()
   @MaxLength(20)
   @MinLength(3)
   name?: string;
 
+  @ApiProperty({
+    required: false,
+  })
   @IsString()
   @MaxLength(20)
   @MinLength(3)
   login?: string;
 
+  @ApiProperty({
+    required: false,
+  })
   @IsString()
   @IsOptional()
-  @MaxLength(20)
-  @MinLength(5)
   @Matches(/[a-zA-Z0-9]{3,30}$/, {
     message: 'password too weak',
   })
   password?: string;
 
+  @ApiProperty({
+    required: false,
+  })
   @IsString()
   @IsOptional()
-  @MinLength(5)
-  @MaxLength(20)
   @Match('password')
   passwordConfirm?: string;
 }
