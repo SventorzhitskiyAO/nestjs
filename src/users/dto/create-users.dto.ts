@@ -18,6 +18,10 @@ export class CreateUsersDto {
 
   @ApiProperty()
   @IsString()
+  role: string;
+
+  @ApiProperty()
+  @IsString()
   @Matches(/[a-zA-Z0-9]{3,30}$/, {
     message: 'password too weak',
   })

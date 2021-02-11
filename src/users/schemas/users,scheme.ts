@@ -12,6 +12,9 @@ export class User {
   @Prop()
   login: string;
 
+  @Prop()
+  role: string;
+
   @Prop({
     type: String,
     set: (password) => bcrypt.hashSync(password, bcrypt.genSaltSync(10)),

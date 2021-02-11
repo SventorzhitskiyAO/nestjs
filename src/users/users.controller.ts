@@ -14,9 +14,12 @@ import { UpdateUsersDto } from './dto/update-users.dto';
 import { UsersService } from './users.service';
 import { User } from './schemas/users,scheme';
 import { LoginDto } from './dto/login.dto';
-import { UsersGuards } from '../guards/users.guards';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+// import { UsersGuards } from '../guards/users.guards';
+import { ApiBody, ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserDto } from './dto/user.dto';
+import { Roles } from '../decorators/roles.decorators';
+import { RolesGuard } from '../guards/roles.guard';
+import { UserRoles } from '../constants/users-role.enum';
 
 @Controller('users')
 @ApiTags('user')
@@ -37,12 +40,18 @@ export class UsersController {
     return this.usersService.getAll();
   }
 
-  @UseGuards(UsersGuards)
+  @Roles(UserRoles.Admin)
+  // @UseGuards(UsersGuards) // TODO I have to think and decide to delete or not, because check token there is in RolesGuard
+  @UseGuards(RolesGuard)
   @Get(':id')
   @ApiResponse({
     status: 200,
     description: 'Get user by id',
     type: UserDto,
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden',
   })
   @ApiResponse({
     status: 404,
@@ -64,6 +73,7 @@ export class UsersController {
     description: 'Not found',
   })
   create(@Body(new ValidationPipe()) user: CreateUsersDto): Promise<User> {
+    console.log(1);
     return this.usersService.create(user);
   }
 

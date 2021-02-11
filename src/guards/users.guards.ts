@@ -15,19 +15,19 @@ export class UsersGuards implements CanActivate {
   canActivate(context: ExecutionContext): boolean | Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
     try {
-      return this.checkJWT(request);
+      return this.checkJWT(request, context);
     } catch (e) {
       return false;
     }
   }
 
-  async checkJWT(request): Promise<boolean> {
-    if (!request.headers['authorization']) {
+  async checkJWT(req, context): Promise<boolean> {
+    if (!req.headers['authorization']) {
       return false;
     }
     try {
       const jwtSecret = this.configService.get('JWT_SECRET');
-      const token = request.headers['authorization']
+      const token = req.headers['authorization']
         .toString()
         .replace('Bearer ', '');
       const userInfo = jwt.verify(token, jwtSecret);
@@ -36,7 +36,7 @@ export class UsersGuards implements CanActivate {
         const user = await this.userModel
           .findOne({ login: userInfo.login })
           .exec();
-        request.user = user;
+        context.switchToHttp().getRequest().user = user;
         if (user) {
           return true;
         }

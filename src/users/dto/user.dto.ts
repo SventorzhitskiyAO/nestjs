@@ -8,5 +8,8 @@ export class UserDto {
   login: string;
 
   @ApiProperty()
+  role: string;
+
+  @ApiProperty()
   password: string;
 }
