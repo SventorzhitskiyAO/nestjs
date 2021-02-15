@@ -20,6 +20,7 @@ import { UserDto } from './dto/user.dto';
 import { Roles } from '../decorators/roles.decorators';
 import { RolesGuard } from '../guards/roles.guard';
 import { UserRoles } from '../constants/users-role.enum';
+import { UserLoginDto } from './dto/userr-login.dto';
 
 @Controller('users')
 @ApiTags('user')
@@ -40,9 +41,9 @@ export class UsersController {
     return this.usersService.getAll();
   }
 
-  @Roles(UserRoles.Admin)
+  // @Roles(UserRoles.Admin)
   // @UseGuards(UsersGuards) // TODO I have to think and decide to delete or not, because check token there is in RolesGuard
-  @UseGuards(RolesGuard)
+  // @UseGuards(RolesGuard)
   @Get(':id')
   @ApiResponse({
     status: 200,
@@ -76,7 +77,8 @@ export class UsersController {
     console.log(1);
     return this.usersService.create(user);
   }
-
+  @Roles(UserRoles.Admin)
+  @UseGuards(RolesGuard)
   @Delete(':id')
   @ApiResponse({
     status: 200,
@@ -120,5 +122,11 @@ export class UsersController {
   @ApiBody({ type: LoginDto })
   login(@Body() loginBody: LoginDto) {
     return this.usersService.login(loginBody);
+  }
+
+  @Post('/userName')
+  @ApiBody({ type: UserLoginDto })
+  getUserLogin(@Body() login: UserLoginDto) {
+    return this.usersService.getByLogin(login);
   }
 }

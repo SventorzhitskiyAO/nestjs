@@ -9,6 +9,7 @@ import { User, UserDocument } from './schemas/users,scheme';
 import { UpdateUsersDto } from './dto/update-users.dto';
 import { UserInfoDto } from './dto/user-info.dto';
 import { ConfigService } from '@nestjs/config';
+import { UserLoginDto } from './dto/userr-login.dto';
 
 @Injectable()
 export class UsersService {
@@ -23,6 +24,10 @@ export class UsersService {
 
   async getById(id: string): Promise<User> {
     return this.userModel.findById(id).exec();
+  }
+
+  async getByLogin(login: UserLoginDto): Promise<User> {
+    return this.userModel.findOne(login);
   }
 
   async create(usersDto: CreateUsersDto): Promise<User> {

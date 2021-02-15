@@ -31,7 +31,6 @@ export class RolesGuard implements CanActivate {
         return true;
       }
       const user = request.user;
-      console.log(user.name, roles[0]);
       return this.matchRoles(roles, user.role);
     }
     return false;
@@ -49,6 +48,7 @@ export class RolesGuard implements CanActivate {
   }
 
   async checkJWT(req): Promise<boolean> {
+    console.log(req);
     if (!req.headers['authorization']) {
       return false;
     }
