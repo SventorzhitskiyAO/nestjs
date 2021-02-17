@@ -51,6 +51,7 @@ export class UsersService {
 
   async login({ login, password }): Promise<UserInfoDto> {
     try {
+      // console.log(login, password);
       const jwtToken = this.configService.get('JWT_SECRET');
       const user = await this.checkCredentials(login, password);
       const token = jwt.sign({ login }, jwtToken);

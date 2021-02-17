@@ -48,7 +48,6 @@ export class RolesGuard implements CanActivate {
   }
 
   async checkJWT(req): Promise<boolean> {
-    console.log(req);
     if (!req.headers['authorization']) {
       return false;
     }

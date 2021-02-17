@@ -77,8 +77,9 @@ export class UsersController {
     console.log(1);
     return this.usersService.create(user);
   }
-  @Roles(UserRoles.Admin)
-  @UseGuards(RolesGuard)
+
+  // @Roles(UserRoles.Admin)
+  // @UseGuards(RolesGuard)
   @Delete(':id')
   @ApiResponse({
     status: 200,
