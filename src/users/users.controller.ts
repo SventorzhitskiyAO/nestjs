@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Req,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
@@ -14,13 +15,14 @@ import { UpdateUsersDto } from './dto/update-users.dto';
 import { UsersService } from './users.service';
 import { User } from './schemas/users,scheme';
 import { LoginDto } from './dto/login.dto';
-// import { UsersGuards } from '../guards/users.guards';
 import { ApiBody, ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserDto } from './dto/user.dto';
 import { Roles } from '../decorators/roles.decorators';
 import { RolesGuard } from '../guards/roles.guard';
 import { UserRoles } from '../constants/users-role.enum';
 import { UserLoginDto } from './dto/userr-login.dto';
+import { UsersGuards } from '../guards/users.guards';
+import { Request } from 'express';
 
 @Controller('users')
 @ApiTags('user')
@@ -41,8 +43,8 @@ export class UsersController {
     return this.usersService.getAll();
   }
 
-  // @Roles(UserRoles.Admin)
-  // @UseGuards(UsersGuards) // TODO I have to think and decide to delete or not, because check token there is in RolesGuard
+  @Roles(UserRoles.Admin)
+  @UseGuards(UsersGuards) // TODO I have to think and decide to delete or not, because check token there is in RolesGuard
   // @UseGuards(RolesGuard)
   @Get(':id')
   @ApiResponse({
@@ -58,7 +60,11 @@ export class UsersController {
     status: 404,
     description: 'Not found',
   })
-  getOne(@Param('id') id: string): Promise<User> {
+  getOne(@Param('id') id: string, @Req() request: Request): Promise<User> {
+    // Todo разобраться с линтом
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    console.log(request.user);
     return this.usersService.getById(id);
   }
 
@@ -74,7 +80,6 @@ export class UsersController {
     description: 'Not found',
   })
   create(@Body(new ValidationPipe()) user: CreateUsersDto): Promise<User> {
-    console.log(1);
     return this.usersService.create(user);
   }
 

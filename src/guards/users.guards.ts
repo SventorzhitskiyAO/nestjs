@@ -38,6 +38,7 @@ export class UsersGuards implements CanActivate {
           .exec();
         context.switchToHttp().getRequest().user = user;
         if (user) {
+          req.user = user;
           return true;
         }
       }
