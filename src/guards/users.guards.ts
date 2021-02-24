@@ -1,6 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
-import { User, UserDocument } from '../users/schemas/users,scheme';
+import { User, UserDocument } from '../schemas/users,scheme';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ConfigService } from '@nestjs/config';

@@ -6,23 +6,21 @@ import {
   Param,
   Post,
   Put,
-  Req,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+
 import { CreateUsersDto } from './dto/create-users.dto';
 import { UpdateUsersDto } from './dto/update-users.dto';
-import { UsersService } from './users.service';
-import { User } from './schemas/users,scheme';
-import { LoginDto } from './dto/login.dto';
-import { ApiBody, ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UsersService } from './users.services';
+import { User } from '../schemas/users,scheme';
 import { UserDto } from './dto/user.dto';
 import { Roles } from '../decorators/roles.decorators';
-import { RolesGuard } from '../guards/roles.guard';
 import { UserRoles } from '../constants/users-role.enum';
 import { UserLoginDto } from './dto/userr-login.dto';
 import { UsersGuards } from '../guards/users.guards';
-import { Request } from 'express';
+import { RolesGuard } from '../guards/roles.guard';
 
 @Controller('users')
 @ApiTags('user')
@@ -43,9 +41,9 @@ export class UsersController {
     return this.usersService.getAll();
   }
 
-  @Roles(UserRoles.Admin)
-  @UseGuards(UsersGuards) // TODO I have to think and decide to delete or not, because check token there is in RolesGuard
-  // @UseGuards(RolesGuard)
+  @Roles(UserRoles.Admin, UserRoles.User)
+  @UseGuards(UsersGuards)
+  @UseGuards(RolesGuard)
   @Get(':id')
   @ApiResponse({
     status: 200,
@@ -60,11 +58,7 @@ export class UsersController {
     status: 404,
     description: 'Not found',
   })
-  getOne(@Param('id') id: string, @Req() request: Request): Promise<User> {
-    // Todo разобраться с линтом
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    console.log(request.user);
+  getOne(@Param('id') id: string): Promise<User> {
     return this.usersService.getById(id);
   }
 
@@ -83,8 +77,8 @@ export class UsersController {
     return this.usersService.create(user);
   }
 
-  // @Roles(UserRoles.Admin)
-  // @UseGuards(RolesGuard)
+  @Roles(UserRoles.Admin, UserRoles.User)
+  @UseGuards(RolesGuard)
   @Delete(':id')
   @ApiResponse({
     status: 200,
@@ -97,6 +91,8 @@ export class UsersController {
     return this.usersService.remove(id);
   }
 
+  @Roles(UserRoles.Admin, UserRoles.User)
+  @UseGuards(RolesGuard)
   @Put(':id')
   @ApiResponse({
     status: 201,
@@ -113,21 +109,6 @@ export class UsersController {
     @Body(new ValidationPipe()) updateUser: UpdateUsersDto,
   ): Promise<User> {
     return this.usersService.update(id, updateUser);
-  }
-
-  @Post('/login')
-  @ApiResponse({
-    status: 200,
-    description: 'Get users and token',
-    type: Object,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Not found',
-  })
-  @ApiBody({ type: LoginDto })
-  login(@Body() loginBody: LoginDto) {
-    return this.usersService.login(loginBody);
   }
 
   @Post('/userName')

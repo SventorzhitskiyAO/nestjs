@@ -5,7 +5,7 @@ import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 
 import { CreateUsersDto } from './dto/create-users.dto';
-import { User, UserDocument } from './schemas/users,scheme';
+import { User, UserDocument } from '../schemas/users,scheme';
 import { UpdateUsersDto } from './dto/update-users.dto';
 import { UserInfoDto } from './dto/user-info.dto';
 import { ConfigService } from '@nestjs/config';
@@ -51,10 +51,10 @@ export class UsersService {
 
   async login({ login, password }): Promise<UserInfoDto> {
     try {
-      // console.log(login, password);
       const jwtToken = this.configService.get('JWT_SECRET');
       const user = await this.checkCredentials(login, password);
       const token = jwt.sign({ login }, jwtToken);
+
       return { user, token };
     } catch (e) {
       throw new HttpException('Wrong login or password', 400);

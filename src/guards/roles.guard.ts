@@ -4,7 +4,7 @@ import * as jwt from 'jsonwebtoken';
 import { UserRoles } from '../constants/users-role.enum';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from '../users/schemas/users,scheme';
+import { User, UserDocument } from '../schemas/users,scheme';
 import { Model } from 'mongoose';
 
 @Injectable()
@@ -31,12 +31,12 @@ export class RolesGuard implements CanActivate {
         return true;
       }
       const user = request.user;
-      return this.matchRoles(roles, user.role);
+      return RolesGuard.matchRoles(roles, user.role);
     }
     return false;
   }
 
-  private matchRoles(roles: string[], userRole): boolean {
+  private static matchRoles(roles: string[], userRole): boolean {
     switch (userRole) {
       case UserRoles.Admin:
         return true;

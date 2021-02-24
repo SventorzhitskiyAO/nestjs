@@ -1,4 +1,4 @@
-import { User } from '../schemas/users,scheme';
+import { User } from '../../schemas/users,scheme';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UserInfoDto {
